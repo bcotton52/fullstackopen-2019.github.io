@@ -23,7 +23,7 @@ Since our application's backend is still relatively simple, we will make the dec
 In one of the previous chapters of the course material, we mentioned that when your backend server is running in Heroku, it is in <i>production</i> mode.
 
 
-The convention in Node is to define the execution mode of the application with the <i>NODE\_ENV</i> environment variable. In our current application, we only load the environment variables defined in the <i>.env</i> file is the application is <i>not</i> in production mode.
+The convention in Node is to define the execution mode of the application with the <i>NODE\_ENV</i> environment variable. In our current application, we only load the environment variables defined in the <i>.env</i> file if the application is <i>not</i> in production mode.
 
 It is common practice to define separate modes for development and testing.
 
@@ -82,7 +82,7 @@ Now we can modify the way that our application runs in different modes. As an ex
 We can create our separate test database in Mongo DB Atlas. This is not an optimal solution in situations where there are many people developing the same application. Test execution in particular typically requires that a single database instance is not used by tests that are running concurrently.
 
 
-It would be better run our tests using a database that is installed and running in the developer's local machine. The optimal solution would be to have every test execution use its own separate database. This is "relatively simple" to achieve by [running Mongo in-memory](https://docs.mongodb.com/manual/core/inmemory/) or by using [Docker](https://www.docker.com) containers. We will not complicate things and will instead continue to use the MongoDB Atlas database.
+It would be better to run our tests using a database that is installed and running in the developer's local machine. The optimal solution would be to have every test execution use its own separate database. This is "relatively simple" to achieve by [running Mongo in-memory](https://docs.mongodb.com/manual/core/inmemory/) or by using [Docker](https://www.docker.com) containers. We will not complicate things and will instead continue to use the MongoDB Atlas database.
 
 
 Let's make some changes to the module that defines the application's configuration:
@@ -426,7 +426,7 @@ Pay special attention to the expect in the latter test. The <code>response.body.
 The _npm test_ command executes all of the tests of the application. When we are writing tests, it is usually wise to only execute one or two tests. Jest offers a few different ways of accomplishing this, one of which is the [only](https://jestjs.io/docs/en/api#testonlyname-fn-timeout) method. If tests are written across many files, this method is not great.
 
 
-A better option is to use Jest directly without npm. This way we can specify what the tests that we want to run with Jest. The following command only runs the tests found in the <i>tests/note_api.test.js</i> file:
+A better option is to use Jest directly without npm. This way we can specify which are the tests that we want to run with Jest. The following command only runs the tests found in the <i>tests/note_api.test.js</i> file:
 
 ```js
 npx jest tests/note_api.test.js --runInBand
@@ -538,9 +538,7 @@ const main = async () => { // highlight-line
   const notes = await Note.find({})
   console.log('operation returned the following notes', notes)
 
-  const notes = await Note.find({})
   const response = await notes[0].remove()
-
   console.log('the first note is removed')
 }
 
@@ -995,7 +993,7 @@ beforeEach(async () => {
 The solution is quite advanced despite its compact appearance. The _noteObject_ variable is assigned to an array of Mongoose objects that are created with the _Note_ constructor for each of the notes in the _helper.initialNotes_ array. The next line of code creates a new array that <i>consists of promises</i>, that are created by calling the _save_ method of each item in the _noteObjects_ array. In other words, it is an array of promises for saving each of the items to the database.
 
 
-The [Promise.all](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) method can be used for transforming an array of promises into a single promise, that will be <i>fulfilled</i> once every promise in the array passed to it is as a parameter is resolved. The last line of code <em>await Promise.all(promiseArray)</em> waits that every promise for saving a note is finished, meaning that the database has been initialized.
+The [Promise.all](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) method can be used for transforming an array of promises into a single promise, that will be <i>fulfilled</i> once every promise in the array passed to it as a parameter is resolved. The last line of code <em>await Promise.all(promiseArray)</em> waits that every promise for saving a note is finished, meaning that the database has been initialized.
 
 
 > The returned values of each promise in the array can still be accessed when using the Promise.all method. If we wait for the promises to be resolved with the _await_ syntax <em>const results = await Promise.all(promiseArray)</em>, the operation will return an array that contains the resolved values for each promise in the _promiseArray_, and they appear in the same order as the promises in the array.
